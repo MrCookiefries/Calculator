@@ -1,6 +1,98 @@
 /* Global & Variables */
 @font: 'Fira Code', monospace;
 
-html, body {
-  font-family: @font;
+@colors: {
+  dark: hsla(0, 0%, 10%, 1);
+  gray: hsla(0, 0%, 36%, 1);
+  white: hsla(0, 0%, 100%, 1);
+  orange: hsla(25, 58%, 54%, 1);
+  black: hsla(0, 0%, 0%, 1);
 }
+
+.full {
+  height: 100%;
+  width: 100%;
+}
+
+.flex {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+body {
+  font-family: @font;
+  &:extend(.flex);
+  background-color: @colors[white];
+}
+
+.hover:hover {
+  cursor: pointer;
+}
+
+/* Calculator */
+main {
+  background-color: @colors[black];
+  padding: 10px;
+  display: grid;
+  grid-template-rows: 1fr 3fr;
+  &:extend(.full);
+  margin: 10px;
+
+  section.display {
+    background-color: @colors[gray];
+    &:extend(.full);
+    h1 {
+      font-size: 42px;
+      padding: 20px;
+      font-weight: 600;
+      text-align: right;
+      color: @colors[white];
+    }
+  }
+
+  section.buttons {
+    background-color: @colors[dark];
+    text-align: center;
+    display: grid;
+    grid-template-columns: 4fr 1fr;
+    padding-top: 2px;
+
+    div.main {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      grid-gap: 2px;
+
+      div {
+        &:extend(.full);
+        &:extend(.flex);
+        background-color: @colors[orange];
+
+        p {
+          padding: 4px;
+          font-size: 24px;
+        }
+      }
+    }
+
+    aside {
+      display: grid;
+      grid-template-rows: repeat(6, 1fr);
+      grid-gap: 2px;
+      border-left: 2px solid @colors[dark];
+
+      div {
+        background-color: @colors[white];
+
+        p {
+          color: @colors[black];
+          padding: 4px;
+          font-size: 24px;
+        }
+      }
+    }
+  }
+}
+
+
+/* Responsive Design */
