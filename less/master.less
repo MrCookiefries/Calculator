@@ -24,6 +24,8 @@ body {
   font-family: @font;
   &:extend(.flex);
   background-color: @colors[white];
+  height: 100vh;
+  width: 100vw;
 }
 
 .hover:hover {
@@ -34,17 +36,19 @@ body {
 main {
   background-color: @colors[black];
   padding: 10px;
+  width: 320px;
+  height: 600px;
   display: grid;
-  grid-template-rows: 1fr 3fr;
-  &:extend(.full);
-  margin: 10px;
+  grid-template-rows: 1fr 5fr;
+  margin: 20px;
 
   section.display {
     background-color: @colors[gray];
-    &:extend(.full);
+    min-height: 0;
+
     h1 {
       font-size: 42px;
-      padding: 20px;
+      padding: 10px;
       font-weight: 600;
       text-align: right;
       color: @colors[white];
@@ -57,29 +61,33 @@ main {
     display: grid;
     grid-template-columns: 4fr 1fr;
     padding-top: 2px;
+    min-height: 0;
 
     div.main {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      height: 500px;
+      grid-template-columns: repeat(5, 1fr);
+      grid-template-rows: repeat(4, 1fr);
       grid-gap: 2px;
 
       div {
-        &:extend(.full);
         &:extend(.flex);
         background-color: @colors[orange];
 
         p {
           padding: 4px;
-          font-size: 24px;
+          font-size: 30px;
         }
       }
     }
 
     aside {
       display: grid;
-      grid-template-rows: repeat(6, 1fr);
+      grid-template-columns: 1fr;
+      grid-template-rows: repeat(6, minmax(0, 1fr));
       grid-gap: 2px;
       border-left: 2px solid @colors[dark];
+      height: 500px;
 
       div {
         background-color: @colors[white];
@@ -87,12 +95,9 @@ main {
         p {
           color: @colors[black];
           padding: 4px;
-          font-size: 24px;
+          font-size: 30px;
         }
       }
     }
   }
 }
-
-
-/* Responsive Design */

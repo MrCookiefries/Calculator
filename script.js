@@ -7,7 +7,25 @@ mainButtons.forEach(button => {
 otherButtons.forEach(button => {
   button.classList.add("hover");
 })
-
-function yay(num) {
-  console.log(`Pressed ${num}`);
+// Equation
+let equation = [];
+// User Input
+function enter(input) {
+  if (typeof input === "number") {
+    equation.push({
+      value: input,
+      type: "number"
+    });
+  } else if (input === '+' || input === '-' || input === '*' || input === '/') {
+    equation.push({
+      value: input,
+      type: "operator"
+    })
+  } else {
+    equation.push({
+      value: input,
+      type: "symbol"
+    });
+  }
+  console.log(equation);
 }
