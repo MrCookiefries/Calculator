@@ -1,6 +1,7 @@
 // Hover & Click
 const mainButtons = document.querySelectorAll('div.main div');
 const otherButtons = document.querySelectorAll('aside div');
+let outPut = document.querySelector(".display h1");
 mainButtons.forEach(button => {
   button.classList.add("hover");
 })
@@ -8,24 +9,27 @@ otherButtons.forEach(button => {
   button.classList.add("hover");
 })
 // Equation
-let equation = [];
+let equation = "";
+// Calc Functions
+function display() {
+  let msg = equation;
+  outPut.innerHTML = msg;
+}
+
+function remove(type) {
+  if (type === "ac") {
+    equation = "";
+  } else {
+    equation = equation.slice(0, equation.length - 1);
+  }
+  display();
+}
+
+function solve() {
+  // All the functions
+}
 // User Input
 function enter(input) {
-  if (typeof input === "number") {
-    equation.push({
-      value: input,
-      type: "number"
-    });
-  } else if (input === '+' || input === '-' || input === '*' || input === '/') {
-    equation.push({
-      value: input,
-      type: "operator"
-    })
-  } else {
-    equation.push({
-      value: input,
-      type: "symbol"
-    });
-  }
-  console.log(equation);
+  equation += input;
+  display();
 }
