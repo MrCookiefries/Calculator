@@ -30,6 +30,10 @@ function solve() {
 }
 // User Input
 function enter(input) {
-  equation += input;
+  if (input === "ac" || input === "del") {
+    remove(input);
+  } else {
+    equation += input;
+  }
   display();
 }
