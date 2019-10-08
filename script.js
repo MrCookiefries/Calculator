@@ -8,18 +8,119 @@ mainButtons.forEach(button => {
 otherButtons.forEach(button => {
   button.classList.add("hover");
 })
+// Native Extensions
+Array.prototype.clean = function() {
+  for (let i = 0; i < this.length; i++) {
+    if (this[i] === "") {
+      this.splice(i, 1);
+    }
+  }
+  return this;
+}
+String.prototype.isNumeric = function() {
+  return !isNaN(parseFloat(this)) && isFinite(this);
+}
 // Equation
 let equation = "";
 // Calc Functions
 function display() {
   let msg = equation;
-  msg = msg.replace("**", "&Hat;");
-  msg = msg.replace("*", "&times;");
-  msg = msg.replace("+", "&plus;");
-  msg = msg.replace("-", "&minus;");
-  msg = msg.replace("/", "&divide;");
-  msg = msg.replace(/Math.sqrt/g, "&radic;");
+  msg = msg.replace(/\*\*/g, "&Hat;");
+  msg = msg.replace(/\*/g, "&times;");
+  msg = msg.replace(/\+/g, "&plus;");
+  msg = msg.replace(/\-/g, "&minus;");
+  msg = msg.replace(/\//g, "&divide;");
+  msg = msg.replace(/\|/g, "&radic;");
+  msg = msg.replace(/\~/g, "&sup2;");
   outPut.innerHTML = msg;
+}
+
+function convert(string) {
+  let result = "";
+  let stack = [];
+  let operatorInfo = {
+    "+": {
+      hierarchy: 1,
+      affects: "left"
+    },
+    "-": {
+      hierarchy: 1,
+      affects: "left"
+    },
+    "*": {
+      hierarchy: 2,
+      affects: "left"
+    },
+    "/": {
+      hierarchy: 2,
+      affects: "left"
+    },
+    "^": {
+      hierarchy: 3,
+      affects: "right"
+    }
+  }
+  string = string.replace(/\s/g, "");
+  string = string.split(/([\+\-\*\/\^\(\)])/).clean();
+  let key;
+  let item1;
+  let item2;
+  for (let i = 0; i < string.length; i++) {
+    key = string[i];
+    if (key.isNumeric()) {
+      result += `${key} `;
+    } else if ("+-*/^".indexOf(key) >= 0) {
+      item1 = key;
+      item2 = stack[stack.length - 1];
+      while ("+-*/^".indexOf(item2) >= 0 && ((operatorInfo[item1].affects === "left" && operatorInfo[item1].hierarchy <= operatorInfo[item2].hierarchy) || (operatorInfo[item1].affects === "right" && operatorInfo[item1].hierarchy < operatorInfo[item2].hierarchy))) {
+        result += `${stack.pop()} `;
+        item2 = stack[stack.length - 1];
+      }
+      stack.push(item1);
+    } else if (key === "(") {
+      stack.push(key);
+    } else if (key === ")") {
+      while (stack[stack.length - 1] !== "(") {
+        result += `${stack.pop()} `;
+      }
+      stack.pop();
+    }
+  }
+  while (stack.length > 0) {
+    result += `${stack.pop()} `;
+  }
+  return result;
+}
+
+function solve(result) {
+  let stack = [];
+  result = result.split(" ");
+  result.pop();
+  let item1;
+  let item2;
+  for (let i = 0; i < result.length; i++) {
+    if (result[i].isNumeric()) {
+      stack.push(result[i]);
+    } else {
+      item1 = stack.pop();
+      item2 = stack.pop();
+      if (result[i] === "+") {
+        stack.push(parseFloat(item1) + parseFloat(item2));
+      } else if (result[i] === "-") {
+        stack.push(parseFloat(item2) - parseFloat(item1));
+      } else if (result[i] === "*") {
+        stack.push(parseFloat(item1) * parseFloat(item2));
+      } else if (result[i] === "/") {
+        stack.push(parseFloat(item2) / parseFloat(item1));
+      } else if (result[i] === "^") {
+        stack.push(parseFloat(item2) ** parseFloat(item1));
+      }
+    }
+  }
+  if (stack.length > 1) {
+    return "Error";
+  }
+  return stack.pop().toString();
 }
 
 function remove(type) {
@@ -29,68 +130,6 @@ function remove(type) {
     equation = equation.slice(0, equation.length - 1);
   }
   display();
-}
-
-function operator(op) {
-  if (equation.indexOf(op) === -1) {
-    return;
-  }
-  let parts = equation.split(op);
-  parts.forEach(part => {
-    part = parseFloat(part);
-  })
-  let index = null;
-  let left = null;
-  let right = null;
-  let result = null;
-  parts.forEach(part => {
-    if (typeof part === "number") {
-      let key = parts.indexOf(part);
-      parts.splice(key + 1, 0, op);
-    }
-  })
-  console.log(parts);
-  while (parts.indexOf(op) !== -1) {
-    index = parts.indexOf(op);
-    if (index === 0) {
-      parts = parts.shift();
-    } else {
-      left = parseFloat(parts[index - 1]);
-      right = parseFloat(parts[index + 1]);
-      switch (op) {
-        case "+":
-          result = left + right;
-          break;
-        case "-":
-          result = left - right;
-          break;
-        case "*":
-          result = left * right;
-          break;
-        case "/":
-          result = left / right;
-          break;
-        default:
-          console.log("Error with operator switch!");
-          break;
-      }
-      console.log(left, right);
-      parts.splice(parts.indexOf(left), 1);
-      parts.splice(parts.indexOf(right), 1);
-      parts.splice(index, 0, result);
-      parts.splice(index, 1);
-    }
-  }
-  equation = parts.join();
-  equation = equation.replace(/,/g, "");
-}
-
-function solve() {
-  operator("*");
-  operator("/");
-  operator("+");
-  operator("-");
-  console.log(equation);
 }
 
 function check() {
@@ -108,6 +147,36 @@ function factorialize(num) {
   }
   return (num * factorialize(num - 1));
 }
+
+function fix(string) {
+  string = string.split(/([\~\|\!\%\+\-\*\/\^\(\)])/).clean();
+  let item;
+  for (i = 0; i < string.length; i++) {
+    if (string[i] === "|") {
+      item = string[i + 1];
+      item = Math.sqrt(parseFloat(item)).toString();
+      string[i + 1] = item;
+      string.splice(i, 1);
+    } else if (string[i] === "!") {
+      item = string[i - 1];
+      item = factorialize(parseFloat(item)).toString();
+      string[i - 1] = item;
+      string.splice(i, 1);
+    } else if (string[i] === "%") {
+      item = string[i - 1];
+      item = (parseFloat(item) / 100).toString();
+      string[i - 1] = item;
+      string.splice(i, 1);
+    } else if (string[i] === "~") {
+      item = string[i - 1];
+      item = parseFloat(item ** 2).toString();
+      string[i - 1] = item;
+      string.splice(i, 1);
+    }
+
+  }
+  return string.join("");
+}
 // User Input
 function enter(input) {
   if (input === "ac" || input === "del") {
@@ -118,12 +187,12 @@ function enter(input) {
     }
     equation += Math.PI;
   } else if (input === "=") {
-    solve();
-  } else if (input === "sqr") {
+    equation = solve(convert(fix(equation)));
+  } else if (input === "|") {
     if (check()) {
       equation += "*";
     }
-    equation += "Math.sqrt(";
+    equation += "|";
   } else if (input === "^") {
     if (check()) {
       equation += "^";
@@ -160,13 +229,12 @@ function enter(input) {
     } else {
       window.alert("Can't divide by an operator!");
     }
-  } else if (input === "sq") {
+  } else if (input === "~") {
     if (check()) {
-      equation += "**";
+      equation += "~";
     } else {
       window.alert("Missing the number before the exponent!");
     }
-    equation += "(";
   } else if (input === "!") {
     if (check()) {
       equation += "!"
